@@ -17,5 +17,3 @@ address <- as.character(unlist(data[9]))
 long <- as.numeric(unlist(data[10]))
 lat <- as.numeric(unlist(data[11]))
 price <- as.numeric(unlist(data[12]))
-
-print(contstruction)
