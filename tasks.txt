@@ -1,3 +1,7 @@
 find and remove outliers
 find prediction models (ggplot2)
 explore models to find good ones to use
+
+find linear (y=mx+b) equations for each column, apply equation one at a time per row, get output
+
+redo decision tree
