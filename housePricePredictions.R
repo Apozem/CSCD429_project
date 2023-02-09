@@ -17,3 +17,12 @@ address <- as.character(unlist(data[9]))
 long <- as.numeric(unlist(data[10]))
 lat <- as.numeric(unlist(data[11]))
 price <- as.numeric(unlist(data[12]))
+
+#get outliers from boxplot data
+outliers <- boxplot(data$TARGET.PRICE_IN_LACS., plot = FALSE)$out
+
+#add column to indicate of a row is an outlier
+data$is_outlier <- ifelse(data$TARGET.PRICE_IN_LACS. %in% boxplot.stats(data$TARGET.PRICE_IN_LACS.)$out, 1, 0)
+
+#remove rows with outliers
+data_no_outlier <- subset(data,is_outlier==0)
