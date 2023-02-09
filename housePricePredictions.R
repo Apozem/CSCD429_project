@@ -26,3 +26,9 @@ data$is_outlier <- ifelse(data$TARGET.PRICE_IN_LACS. %in% boxplot.stats(data$TAR
 
 #remove rows with outliers
 data_no_outlier <- subset(data,is_outlier==0)
+
+outliers_sqft <- boxplot(data_no_outlier$SQUARE_FT, plot = FALSE)$out
+
+data_no_outlier$is_outlier <- ifelse(data_no_outlier$SQUARE_FT %in% boxplot.stats(data_no_outlier$SQUARE_FT)$out, 1, 0)
+
+data_no_outlier <- subset(data_no_outlier,is_outlier==0)
