@@ -2,26 +2,24 @@
 library(rpart)
 library(rpart.plot)
 
+#functions
+create_train_test <- function(data, size = 0.8, train = TRUE) {
+  n_row = nrow(data)
+  total_row = size * n_row
+  train_sample <- 1: total_row
+  if (train == TRUE) {
+    return (data[train_sample, ])
+  } else {
+    return (data[-train_sample, ])
+  }
+}
+
 #retains accuracy of decimal places
 options(digits = 10)
 
 #read in data of train file and test file, from SAME DIRECTORY AS THIS FILE
 data <- read.csv("train.csv")
-test <- read.csv("test.csv")
-
-#data separated into own vectors
-posted <- as.character(unlist(data[1]))
-contstruction <- as.logical(unlist(data[2]))
-rera <- as.logical(unlist(data[3]))
-rooms <- as.integer(unlist(data[4]))
-type <- as.character(unlist(data[5]))
-sqft <- as.numeric(unlist(data[6]))
-ready <- as.logical(unlist(data[7]))
-resale <- as.logical(unlist(data[8]))
-address <- as.character(unlist(data[9]))
-long <- as.numeric(unlist(data[10]))
-lat <- as.numeric(unlist(data[11]))
-price <- as.numeric(unlist(data[12]))
+final_test <- read.csv("test.csv")
 
 #get outliers from boxplot data
 outliers <- boxplot(data$TARGET.PRICE_IN_LACS., plot = FALSE)$out
@@ -40,14 +38,19 @@ data_no_outlier <- subset(data_no_outlier,is_outlier==0)
 #clean data
 clean_data <- data_no_outlier[ , !names(data_no_outlier) %in% c("is_outlier", "ADDRESS")]
 
+#create test and train out of accurate data
+data_train <- create_train_test(clean_data, 0.8, train = TRUE)
+data_test <- create_train_test(clean_data, 0.8, train = FALSE)
+
 #create the basic decision tree
-tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=clean_data)
+tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=data_train, method = 'anova')
 
 #create target price column and fill with zeros
-test$TARGET.PRICE_IN_LACS. <- c(0)
+#final_test$TARGET.PRICE_IN_LACS. <- c(0)
 
-#preditctions
-prd <- predict(tree, test)
+#predictions
+prd <- predict(tree, data_test)
 
 #makes table with predictions
-table_p <- table(test$TARGET.PRICE_IN_LACS., prd)
+table_p <- table(data_test$TARGET.PRICE_IN_LACS., prd)
+#next, hone accuracy, compute on final test data, fill results
