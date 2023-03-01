@@ -14,6 +14,10 @@ create_train_test <- function(data, size = 0.8, train = TRUE) {
   }
 }
 
+inc <- function(x) {
+  eval.parent(substitute(x <- x + 1))
+}
+
 #retains accuracy of decimal places
 options(digits = 10)
 
@@ -54,3 +58,19 @@ prd <- predict(tree, data_test)
 #makes table with predictions
 table_p <- table(data_test$TARGET.PRICE_IN_LACS., prd)
 #next, hone accuracy, compute on final test data, fill results
+
+#fill results to dataset for comparison
+justnumbers <- as.numeric(prd)
+data_test$PREDICTED.PRICE_IN_LACS. <- justnumbers
+
+#compare predictions with actual
+counter <- 0
+for(i in 1:dim(data_test)[1]) {
+  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 15) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 15)) {
+    inc(counter)
+  }
+}
+
+#get accuracy
+acc <- counter/dim(data_test[1])
+#next, change rpart.control() variables to get better accuracy
