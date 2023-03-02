@@ -1,3 +1,7 @@
+#install packages - only need to run once
+#install.packages("rpart")
+#install.packages("rpart.plot")
+
 #libraries
 library(rpart)
 library(rpart.plot)
@@ -18,8 +22,11 @@ inc <- function(x) {
   eval.parent(substitute(x <- x + 1))
 }
 
+
 #retains accuracy of decimal places
 options(digits = 10)
+
+
 
 #read in data of train file and test file, from SAME DIRECTORY AS THIS FILE
 data <- read.csv("train.csv")
@@ -66,11 +73,34 @@ data_test$PREDICTED.PRICE_IN_LACS. <- justnumbers
 #compare predictions with actual
 counter <- 0
 for(i in 1:dim(data_test)[1]) {
-  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 15) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 15)) {
+  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 10) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 10)) {
     inc(counter)
   }
 }
 
 #get accuracy
-acc <- counter/dim(data_test[1])
-#next, change rpart.control() variables to get better accuracy
+acc <- counter/nrow(data_test)
+
+#print the accuracy to screen
+print("Accuracy for tree 1, no settings tweaks: ")
+print(acc)
+
+#tweak tree values
+control <- rpart.control(cp = 0.005)
+
+#do process again
+tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=data_train, method = 'anova', control = control)
+prd <- predict(tree, data_test)
+table_p <- table(data_test$TARGET.PRICE_IN_LACS., prd)
+justnumbers <- as.numeric(prd)
+data_test$PREDICTED.PRICE_IN_LACS. <- justnumbers
+counter <- 0
+for(i in 1:dim(data_test)[1]) {
+  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 10) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 10)) {
+    inc(counter)
+  }
+}
+acc <- counter/nrow(data_test)
+print("Accuracy for tree 1, no settings tweaks: ")
+print(acc)
+rpart.plot(tree)
