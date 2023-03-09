@@ -121,9 +121,9 @@ for(i in 1:dim(data_train)[1]) {
 acc <- counter/nrow(data_train)
 print("Accuracy for training set: ")
 print(acc)
-rpart.plot(tree)
+#rpart.plot(tree)
 
 #Variance of the training dataset
 #High variance the data is generally further from the mean. Low variance does not deviate much from the mean
-var(data_train)
-
+varience <- var(data_train)
+varD <- diag(var(data_test))
