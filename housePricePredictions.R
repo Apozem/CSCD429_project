@@ -55,7 +55,7 @@ data_test <- create_train_test(clean_data, 0.8, train = FALSE)
 
 #create the basic decision tree
 tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=data_train, method = 'anova')
-
+rpart.plot(tree)
 #create target price column and fill with zeros
 #final_test$TARGET.PRICE_IN_LACS. <- c(0)
 
@@ -73,7 +73,7 @@ data_test$PREDICTED.PRICE_IN_LACS. <- justnumbers
 #compare predictions with actual
 counter <- 0
 for(i in 1:dim(data_test)[1]) {
-  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 10) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 10)) {
+  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 15) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 15)) {
     inc(counter)
   }
 }
@@ -96,11 +96,29 @@ justnumbers <- as.numeric(prd)
 data_test$PREDICTED.PRICE_IN_LACS. <- justnumbers
 counter <- 0
 for(i in 1:dim(data_test)[1]) {
-  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 10) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 10)) {
+  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 15) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 15)) {
     inc(counter)
   }
 }
 acc <- counter/nrow(data_test)
-print("Accuracy for tree 1, no settings tweaks: ")
+print("Accuracy for tree 1, with settings tweaks: ")
+print(acc)
+rpart.plot(tree)
+
+#FIND ACCURACY ON TRAINING DATA
+#check variance
+tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=data_train, method = 'anova')
+prd <- predict(tree, data_train)
+table_p <- table(data_train$TARGET.PRICE_IN_LACS., prd)
+justnumbers <- as.numeric(prd)
+data_train$PREDICTED.PRICE_IN_LACS. <- justnumbers
+counter <- 0
+for(i in 1:dim(data_train)[1]) {
+  if(data_train$PREDICTED.PRICE_IN_LACS.[i] <= (data_train$TARGET.PRICE_IN_LACS.[i] + 15) & data_train$PREDICTED.PRICE_IN_LACS.[i] >= (data_train$TARGET.PRICE_IN_LACS.[i] - 15)) {
+    inc(counter)
+  }
+}
+acc <- counter/nrow(data_train)
+print("Accuracy for training set: ")
 print(acc)
 rpart.plot(tree)
