@@ -57,7 +57,7 @@ data_test <- create_train_test(clean_data, 0.8, train = FALSE)
 tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=data_train, method = 'anova')
 rpart.plot(tree)
 #create target price column and fill with zeros
-#final_test$TARGET.PRICE_IN_LACS. <- c(0)
+final_test$PREDICTED.PRICE_IN_LACS. <- c(0)
 
 #predictions
 prd <- predict(tree, data_test)
@@ -85,26 +85,6 @@ acc <- counter/nrow(data_test)
 print("Accuracy for tree 1, no settings tweaks: ")
 print(acc)
 
-#tweak tree values
-control <- rpart.control(cp = 0.005)
-
-#do process again
-tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=data_train, method = 'anova', control = control)
-prd <- predict(tree, data_test)
-table_p <- table(data_test$TARGET.PRICE_IN_LACS., prd)
-justnumbers <- as.numeric(prd)
-data_test$PREDICTED.PRICE_IN_LACS. <- justnumbers
-counter <- 0
-for(i in 1:dim(data_test)[1]) {
-  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 15) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 15)) {
-    inc(counter)
-  }
-}
-acc <- counter/nrow(data_test)
-print("Accuracy for tree 1, with settings tweaks: ")
-print(acc)
-rpart.plot(tree)
-
 #FIND ACCURACY ON TRAINING DATA
 #check variance
 tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=data_train, method = 'anova')
@@ -121,9 +101,33 @@ for(i in 1:dim(data_train)[1]) {
 acc <- counter/nrow(data_train)
 print("Accuracy for training set: ")
 print(acc)
-#rpart.plot(tree)
+rpart.plot(tree)
 
 #Variance of the training dataset
 #High variance the data is generally further from the mean. Low variance does not deviate much from the mean
-varience <- var(data_train)
-varD <- diag(var(data_test))
+var(data_train)
+
+#tweak tree values
+control <- rpart.control(cp = 0.005)
+
+#do process again
+tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=data_train, method = 'anova', control = control)
+prd <- predict(tree, data_test)
+table_p <- table(data_test$TARGET.PRICE_IN_LACS., prd)
+justnumbers <- as.numeric(prd)
+data_test$PREDICTED.PRICE_IN_LACS. <- justnumbers
+counter <- 0
+for(i in 1:dim(data_test)[1]) {
+  if(data_test$PREDICTED.PRICE_IN_LACS.[i] <= (data_test$TARGET.PRICE_IN_LACS.[i] + 15) & data_test$PREDICTED.PRICE_IN_LACS.[i] >= (data_test$TARGET.PRICE_IN_LACS.[i] - 15)) {
+    inc(counter)
+  }
+}
+acc <- counter/nrow(data_test)
+print("Accuracy for tree 2, with settings tweaks: ")
+print(acc)
+rpart.plot(tree)
+
+#Get data from actual test
+tree <- rpart(TARGET.PRICE_IN_LACS. ~., data=data_train, method = 'anova', control = control)
+prd <- predict(tree, final_test)
+final_test$PREDICTED.PRICE_IN_LACS. <- as.numeric(prd)
